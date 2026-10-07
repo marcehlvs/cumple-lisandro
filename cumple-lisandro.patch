@@ -1,0 +1,27 @@
+diff --git a/index.html b/index.html
+index d7133ec..4e2ade9 100644
+--- a/index.html
++++ b/index.html
+@@ -4,6 +4,9 @@
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <meta name="theme-color" content="#75aadb" />
++    <meta name="description" content="Invitación al cumple de Lisandro: Mundial 2026" />
++    <meta name="robots" content="noindex, nofollow" />
++    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E" />
+     <title>Cumple de Lisandro: Mundial 2026</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+diff --git a/src/config.js b/src/config.js
+index 8aaac2b..45ce31e 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -2,7 +2,7 @@
+ export const CONFIG = {
+   nombre: 'Lisandro',
+   edad: 9,
+-  fechaTexto: 'Viernes 23 de octubre, 19:00 hs',
++  fechaTexto: 'Viernes 23 de octubre · 19 hs',
+   // Hora de Argentina (UTC-3). Es la que usa la cuenta regresiva.
+   fecha: '2026-10-23T19:00:00-03:00',
+   // Número para confirmar asistencia, con código de país y sin + ni espacios.
