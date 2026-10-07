@@ -2,7 +2,7 @@
 export const CONFIG = {
   nombre: 'Lisandro',
   edad: 9,
-  fechaTexto: 'Viernes 23 de octubre · 19 hs',
+  fechaTexto: 'Viernes 23 de octubre · 20 hs',
   // Hora de Argentina (UTC-3). Es la que usa la cuenta regresiva.
   fecha: '2026-10-23T19:00:00-03:00',
   // Número para confirmar asistencia, con código de país y sin + ni espacios.
