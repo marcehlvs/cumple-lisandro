@@ -4,7 +4,7 @@ export const CONFIG = {
   edad: 9,
   fechaTexto: 'Viernes 23 de octubre · 20 hs',
   // Hora de Argentina (UTC-3). Es la que usa la cuenta regresiva.
-  fecha: '2026-10-23T19:00:00-03:00',
+  fecha: '2026-10-23T20:00:00-03:00',
   // Número para confirmar asistencia, con código de país y sin + ni espacios.
   // Ejemplo: '5491112345678'. Si queda vacío, el botón de WhatsApp no se muestra.
   whatsapp: '5491126758365',
