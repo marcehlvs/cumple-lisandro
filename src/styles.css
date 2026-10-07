@@ -1,0 +1,150 @@
+:root {
+  --celeste: #75aadb;
+  --celeste-soft: #e3effa;
+  --celeste-stripe: #d3e5f6;
+  --navy: #1f3a6b;
+  --gold: #f6b40e;
+  --pitch: #2a8a51;
+  --pitch-dark: #237a46;
+  --miss: #c8423b;
+  --title: 'Alfa Slab One', Georgia, 'Times New Roman', serif;
+  --body: 'Lato', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  font-family: var(--body);
+  color: var(--navy);
+  min-height: 100vh;
+  /* Rayas verticales suaves, como la camiseta */
+  background: repeating-linear-gradient(90deg, var(--celeste-soft) 0 44px, var(--celeste-stripe) 44px 88px);
+}
+
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 16px 44px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ---------- Encabezado ---------- */
+.hero { text-align: center; }
+.stars { margin: 0; color: var(--gold); font-size: 1.4rem; letter-spacing: 0.4em; padding-left: 0.4em; }
+h1 {
+  font-family: var(--title);
+  font-size: clamp(2.6rem, 14vw, 3.6rem);
+  line-height: 1;
+  margin: 4px 0 0;
+  text-shadow: 0 3px 0 #fff;
+}
+.sub { font-family: var(--title); font-size: 1.6rem; margin: 6px 0 0; }
+.date { margin: 10px 0 0; font-weight: 700; font-size: 1.05rem; }
+
+/* ---------- Cuenta regresiva ---------- */
+.countdown { background: var(--navy); color: #fff; border-radius: 18px; padding: 16px 14px; text-align: center; }
+.cd-title { margin: 0 0 10px; font-weight: 700; }
+.countdown .cd-title:only-child { margin: 0; }
+.cd-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cd-box { background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 10px 0; display: grid; gap: 2px; }
+.cd-num { font-family: var(--title); font-size: 2rem; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.cd-label { font-size: 0.8rem; opacity: 0.85; }
+
+/* ---------- Tarjetas y botones ---------- */
+.card {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px 18px;
+  text-align: center;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 6px 0 var(--navy);
+}
+.card h2 { font-family: var(--title); font-size: 1.7rem; line-height: 1.1; margin: 0; }
+.card p { margin: 0; line-height: 1.45; }
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  font: 900 1.05rem var(--body);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary { background: var(--navy); color: #fff; }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-ghost { background: transparent; border-color: var(--navy); color: var(--navy); }
+.link { background: none; border: 0; padding: 8px; color: var(--navy); font: 700 0.95rem var(--body); text-decoration: underline; cursor: pointer; }
+
+/* ---------- Cancha ---------- */
+.game { padding: 12px; }
+.stage {
+  position: relative;
+  aspect-ratio: 10 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: repeating-linear-gradient(0deg, var(--pitch) 0 36px, var(--pitch-dark) 36px 72px);
+}
+.area { position: absolute; left: 2%; right: 2%; top: 30%; bottom: -3px; border: 3px solid rgba(255, 255, 255, 0.55); border-radius: 6px 6px 0 0; }
+.spot { position: absolute; left: 50%; top: 67.4%; width: 14px; height: 7px; margin-left: -7px; border-radius: 50%; background: rgba(255, 255, 255, 0.85); }
+
+.goal { position: absolute; left: 7%; right: 7%; top: 6%; height: 48%; border: 6px solid #fff; border-bottom: 0; border-radius: 4px 4px 0 0; }
+.net {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 1px, transparent 1px 11px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.28) 0 1px, transparent 1px 11px),
+    rgba(0, 0, 0, 0.2);
+}
+
+.keeper { position: absolute; z-index: 2; transition: left 0.45s ease-out, top 0.45s ease-out, transform 0.45s ease-out; }
+.keeper svg { display: block; }
+
+.zones { position: absolute; inset: 0; z-index: 4; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+.zone { background: transparent; border: 1px dashed rgba(255, 255, 255, 0.5); cursor: pointer; }
+.zone:hover:not(:disabled), .zone:focus-visible { background: rgba(255, 255, 255, 0.28); }
+.zone:disabled { cursor: default; }
+.zone:focus-visible { outline-offset: -4px; }
+
+.ball {
+  position: absolute; z-index: 3; width: 44px; height: 44px;
+  font-size: 40px; line-height: 44px; text-align: center; pointer-events: none;
+  transition: left 0.5s cubic-bezier(0.2, 0.7, 0.3, 1), top 0.5s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.5s ease-out;
+}
+
+.flash {
+  position: absolute; left: 0; right: 0; bottom: 5%; z-index: 5; text-align: center; pointer-events: none;
+  font-family: var(--title); font-size: clamp(2rem, 10vw, 3rem);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  animation: pop 0.35s ease-out;
+}
+.flash.gol { color: var(--gold); }
+.flash.atajada { color: #fff; }
+@keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.score { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.dot { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--navy); background: #fff; display: grid; place-items: center; font-weight: 900; font-size: 0.95rem; line-height: 1; }
+.dot.gol { background: var(--gold); }
+.dot.atajada { background: var(--miss); border-color: var(--miss); color: #fff; }
+.hint { margin: 10px 0 0; font-weight: 700; }
+
+/* ---------- Victoria ---------- */
+.win > :not(.confetti) { position: relative; z-index: 1; }
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.confetti span { position: absolute; top: -16px; width: 8px; height: 14px; border-radius: 2px; animation: caer linear infinite; }
+@keyframes caer { to { transform: translateY(520px) rotate(540deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti span, .flash { animation: none; }
+  .ball, .keeper { transition-duration: 0.01s; }
+}
