@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// base './' hace que funcione igual en la raíz de un dominio o en una subcarpeta (GitHub Pages).
-export default defineConfig({ plugins: [react()], base: './' });
+export default defineConfig({
+  base: '/cumple-lisandro/', // <-- Asegúrate de que esta línea esté exactamente así
+  // plugins: [...]
+})
