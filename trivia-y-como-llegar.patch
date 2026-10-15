@@ -1,0 +1,343 @@
+From a9253af82899529373e9e1fee91d19fa74bcbd5d Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 15 Oct 2026 00:23:35 +0000
+Subject: [PATCH] =?UTF-8?q?Agregar=20trivia=20de=20Argentina=20y=20los=20M?=
+ =?UTF-8?q?undiales=20y=20secci=C3=B3n=20C=C3=B3mo=20llegar?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Trivia de 5 preguntas al azar (banco de 9 en src/trivia.js), opciones
+  mezcladas y dato curioso después de cada respuesta.
+- Sección "Cómo llegar" con la dirección y botón a Google Maps
+  (se oculta si CONFIG.direccion queda vacío).
+- README actualizado.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01V8Fh7KfE6cGHPTKkN87Ajz
+---
+ README.md                     |   4 +-
+ src/App.jsx                   |   4 ++
+ src/components/ComoLlegar.jsx |  22 ++++++
+ src/components/Trivia.jsx     | 125 ++++++++++++++++++++++++++++++++++
+ src/config.js                 |   4 ++
+ src/styles.css                |  12 ++++
+ src/trivia.js                 |  64 +++++++++++++++++
+ 7 files changed, 234 insertions(+), 1 deletion(-)
+ create mode 100644 src/components/ComoLlegar.jsx
+ create mode 100644 src/components/Trivia.jsx
+ create mode 100644 src/trivia.js
+
+diff --git a/README.md b/README.md
+index 9b1697c..dc30f86 100644
+--- a/README.md
++++ b/README.md
+@@ -2,6 +2,8 @@
+ 
+ Invitación de cumpleaños con cuenta regresiva y juego de penales. Al ganar se descarga `public/Invitacion.pdf` sin modificar.
+ 
++También tiene una trivia de Argentina y los Mundiales (5 preguntas al azar, las preguntas están en `src/trivia.js`) y una sección "Cómo llegar" con botón a Google Maps.
++
+ ## Uso
+ ```bash
+ npm install
+@@ -10,7 +12,7 @@ npm run build    # genera /dist
+ ```
+ 
+ ## Configuración
+-Todo está en `src/config.js` (fecha, nombre, número de WhatsApp, nombre del PDF).
++Todo está en `src/config.js` (fecha, dirección, nombre, número de WhatsApp, nombre del PDF).
+ 
+ ## Link por invitado (opcional)
+ `https://tu-sitio/?i=Sofía` saluda al invitado por su nombre. Sin `?i=` no hay saludo.
+diff --git a/src/App.jsx b/src/App.jsx
+index 23a56c5..cffe31e 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -1,5 +1,7 @@
+ import Countdown from './components/Countdown';
+ import PenaltyGame from './components/PenaltyGame';
++import Trivia from './components/Trivia';
++import ComoLlegar from './components/ComoLlegar';
+ import { CONFIG } from './config';
+ 
+ // Saludo opcional: tuapp.com/?i=Sofía muestra "Hola, Sofía". Si no hay parámetro, no se saluda.
+@@ -22,6 +24,8 @@ export default function App() {
+ 
+       <Countdown />
+       <PenaltyGame nombre={nombre} />
++      <Trivia />
++      <ComoLlegar />
+     </main>
+   );
+ }
+diff --git a/src/components/ComoLlegar.jsx b/src/components/ComoLlegar.jsx
+new file mode 100644
+index 0000000..2af3d75
+--- /dev/null
++++ b/src/components/ComoLlegar.jsx
+@@ -0,0 +1,22 @@
++import { CONFIG } from '../config';
++
++export default function ComoLlegar() {
++  if (!CONFIG.direccion) return null;
++
++  const mapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
++    CONFIG.direccionMapa || CONFIG.direccion
++  )}`;
++
++  return (
++    <section className="card">
++      <h2>¿Cómo llegar?</h2>
++      <p>
++        <strong>{CONFIG.direccion}</strong>
++      </p>
++      <p>¡Los esperamos a los chicos y a toda la familia!</p>
++      <a className="btn btn-primary" href={mapa} target="_blank" rel="noreferrer">
++        Abrir en Google Maps
++      </a>
++    </section>
++  );
++}
+diff --git a/src/components/Trivia.jsx b/src/components/Trivia.jsx
+new file mode 100644
+index 0000000..b3adcb8
+--- /dev/null
++++ b/src/components/Trivia.jsx
+@@ -0,0 +1,125 @@
++import { useState } from 'react';
++import { PREGUNTAS } from '../trivia';
++
++const POR_RONDA = 5;
++
++function mezclar(lista) {
++  const a = [...lista];
++  for (let i = a.length - 1; i > 0; i--) {
++    const j = Math.floor(Math.random() * (i + 1));
++    [a[i], a[j]] = [a[j], a[i]];
++  }
++  return a;
++}
++
++// Elige POR_RONDA preguntas al azar y mezcla las opciones de cada una.
++function armarRonda() {
++  return mezclar(PREGUNTAS)
++    .slice(0, POR_RONDA)
++    .map((p) => ({
++      ...p,
++      opciones: mezclar(p.opciones.map((texto, i) => ({ texto, ok: i === p.correcta }))),
++    }));
++}
++
++function mensajeFinal(aciertos) {
++  if (aciertos === POR_RONDA) return '¡Perfecto! Sos campeón del mundo de la trivia.';
++  if (aciertos >= 3) return '¡Muy bien! Casi te llaman a la selección.';
++  return '¡Buen intento! Con un poco de práctica llegás lejos.';
++}
++
++export default function Trivia() {
++  const [estado, setEstado] = useState('inicio'); // inicio | jugando | fin
++  const [ronda, setRonda] = useState([]);
++  const [indice, setIndice] = useState(0);
++  const [elegida, setElegida] = useState(null);
++  const [aciertos, setAciertos] = useState(0);
++
++  function empezar() {
++    setRonda(armarRonda());
++    setIndice(0);
++    setElegida(null);
++    setAciertos(0);
++    setEstado('jugando');
++  }
++
++  function elegir(i) {
++    if (elegida !== null) return;
++    setElegida(i);
++    if (ronda[indice].opciones[i].ok) setAciertos((a) => a + 1);
++  }
++
++  function siguiente() {
++    if (indice + 1 >= ronda.length) {
++      setEstado('fin');
++    } else {
++      setIndice(indice + 1);
++      setElegida(null);
++    }
++  }
++
++  if (estado === 'inicio') {
++    return (
++      <section className="card">
++        <h2>¡Tiempo suplementario!</h2>
++        <p>
++          {POR_RONDA} preguntas sobre Argentina y los Mundiales. Es un bonus para jugar en familia: la entrada se gana
++          con los penales.
++        </p>
++        <button className="btn btn-primary" onClick={empezar}>Jugar la trivia</button>
++      </section>
++    );
++  }
++
++  if (estado === 'fin') {
++    return (
++      <section className="card">
++        <h2>
++          {aciertos} de {ronda.length}
++        </h2>
++        <p>{mensajeFinal(aciertos)}</p>
++        <button className="btn btn-primary" onClick={empezar}>Jugar de nuevo</button>
++      </section>
++    );
++  }
++
++  const p = ronda[indice];
++  const respondida = elegida !== null;
++  const acerto = respondida && p.opciones[elegida].ok;
++  const correcta = p.opciones.find((o) => o.ok);
++
++  return (
++    <section className="card trivia">
++      <p className="trivia-progreso">Pregunta {indice + 1} de {ronda.length}</p>
++      <h2 className="trivia-pregunta">{p.pregunta}</h2>
++
++      <div className="trivia-opciones">
++        {p.opciones.map((o, i) => {
++          let clase = 'btn btn-ghost opcion';
++          if (respondida && o.ok) clase += ' ok';
++          else if (respondida && i === elegida) clase += ' mal';
++          return (
++            <button key={o.texto} className={clase} onClick={() => elegir(i)} disabled={respondida}>
++              {o.texto}
++            </button>
++          );
++        })}
++      </div>
++
++      <div className="trivia-resultado" role="status" aria-live="polite">
++        {respondida && (
++          <>
++            <p className="trivia-veredicto">{acerto ? '¡Correcto!' : `Era: ${correcta.texto}`}</p>
++            <p>{p.dato}</p>
++          </>
++        )}
++      </div>
++
++      {respondida && (
++        <button className="btn btn-gold" onClick={siguiente}>
++          {indice + 1 >= ronda.length ? 'Ver mi resultado' : 'Siguiente'}
++        </button>
++      )}
++    </section>
++  );
++}
+diff --git a/src/config.js b/src/config.js
+index 9e9a38d..8467ad4 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -5,6 +5,10 @@ export const CONFIG = {
+   fechaTexto: 'Sábado 24 de octubre · 20:30 hs',
+   // Hora de Argentina (UTC-3). Es la que usa la cuenta regresiva.
+   fecha: '2026-10-24T20:30:00-03:00',
++  // Lugar de la fiesta. Si queda vacío, no se muestra la sección "Cómo llegar".
++  direccion: 'Calle 889 N° 4361',
++  // Lo que se busca en Google Maps. Conviene sumarle la localidad para que no se confunda de lugar.
++  direccionMapa: 'Calle 889 4361, Buenos Aires, Argentina',
+   // Número para confirmar asistencia, con código de país y sin + ni espacios.
+   // Ejemplo: '5491112345678'. Si queda vacío, el botón de WhatsApp no se muestra.
+   whatsapp: '5491126758365',
+diff --git a/src/styles.css b/src/styles.css
+index d6e95d6..c6b33fc 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -140,6 +140,18 @@ h1 {
+ .dot.atajada { background: var(--miss); border-color: var(--miss); color: #fff; }
+ .hint { margin: 10px 0 0; font-weight: 700; }
+ 
++/* ---------- Trivia ---------- */
++.trivia-progreso { font-weight: 700; font-size: 0.9rem; opacity: 0.8; }
++.card h2.trivia-pregunta { font-size: 1.35rem; }
++.trivia-opciones { display: grid; gap: 8px; }
++.opcion { text-align: left; }
++.opcion:disabled { cursor: default; }
++.opcion.ok { background: var(--pitch); border-color: var(--pitch); color: #fff; }
++.opcion.mal { background: var(--miss); border-color: var(--miss); color: #fff; }
++.trivia-resultado:empty { display: none; }
++.trivia-resultado { display: grid; gap: 4px; }
++.card .trivia-veredicto { font-weight: 900; font-size: 1.1rem; }
++
+ /* ---------- Victoria ---------- */
+ .win > :not(.confetti) { position: relative; z-index: 1; }
+ .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+diff --git a/src/trivia.js b/src/trivia.js
+new file mode 100644
+index 0000000..dcbdd8a
+--- /dev/null
++++ b/src/trivia.js
+@@ -0,0 +1,64 @@
++// Preguntas de la trivia. Cada ronda usa 5 al azar y mezcla las opciones.
++// `correcta` es la posición (empezando en 0) de la respuesta correcta en `opciones`.
++// `dato` se muestra después de responder.
++export const PREGUNTAS = [
++  {
++    pregunta: '¿En qué año ganó Argentina su primer Mundial?',
++    opciones: ['1978', '1986', '1990', '2022'],
++    correcta: 0,
++    dato: 'Fue en 1978, y el Mundial se jugó en la propia Argentina.',
++  },
++  {
++    pregunta: '¿Qué jugador hizo el "gol del siglo" en el Mundial de 1986?',
++    opciones: ['Diego Maradona', 'Mario Kempes', 'Gabriel Batistuta', 'Lionel Messi'],
++    correcta: 0,
++    dato: 'Maradona gambeteó a medio equipo de Inglaterra, y Argentina salió campeona en México 1986.',
++  },
++  {
++    pregunta: '¿Qué país organizó el Mundial de 2022 que ganó Argentina?',
++    opciones: ['Qatar', 'Rusia', 'Brasil', 'Alemania'],
++    correcta: 0,
++    dato: 'Se jugó en Qatar, en noviembre y diciembre de 2022.',
++  },
++  {
++    pregunta: '¿Quién era el entrenador de Argentina en Qatar 2022?',
++    opciones: ['Lionel Scaloni', 'Marcelo Bielsa', 'Alejandro Sabella', 'Diego Simeone'],
++    correcta: 0,
++    dato: 'Lionel Scaloni dirigió a la selección y se quedó con la copa.',
++  },
++  {
++    pregunta: '¿Qué arquero fue figura en los penales de Qatar 2022?',
++    opciones: ['Emiliano "Dibu" Martínez', 'Sergio Romero', 'Franco Armani', 'Gerónimo Rulli'],
++    correcta: 0,
++    dato: 'El Dibu atajó penales contra Países Bajos y contra Francia.',
++  },
++  {
++    pregunta: '¿Contra qué selección jugó Argentina la final de 2022?',
++    opciones: ['Francia', 'Brasil', 'Croacia', 'Alemania'],
++    correcta: 0,
++    dato: 'Empataron 3 a 3 y Argentina ganó 4 a 2 por penales.',
++  },
++  {
++    pregunta: '¿Cuántas estrellas tiene la camiseta argentina por los Mundiales ganados?',
++    opciones: ['2', '3', '4', '5'],
++    correcta: 1,
++    dato: 'Una por 1978, otra por 1986 y la tercera por 2022.',
++  },
++  {
++    pregunta: '¿Qué tres países organizan el Mundial 2026?',
++    opciones: [
++      'Estados Unidos, México y Canadá',
++      'Argentina, Brasil y Chile',
++      'España, Francia e Italia',
++      'Japón, Corea y China',
++    ],
++    correcta: 0,
++    dato: 'Además, es el primer Mundial con 48 selecciones.',
++  },
++  {
++    pregunta: '¿De qué colores es la camiseta de la selección argentina?',
++    opciones: ['Celeste y blanca', 'Roja y blanca', 'Verde y amarilla', 'Azul y negra'],
++    correcta: 0,
++    dato: 'Celeste y blanca, con tres estrellas arriba del escudo.',
++  },
++];
+-- 
+2.43.0
+

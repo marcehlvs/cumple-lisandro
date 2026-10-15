@@ -1,5 +1,7 @@
 import Countdown from './components/Countdown';
 import PenaltyGame from './components/PenaltyGame';
+import Trivia from './components/Trivia';
+import ComoLlegar from './components/ComoLlegar';
 import { CONFIG } from './config';
 
 // Saludo opcional: tuapp.com/?i=Sofía muestra "Hola, Sofía". Si no hay parámetro, no se saluda.
@@ -22,6 +24,8 @@ export default function App() {
 
       <Countdown />
       <PenaltyGame nombre={nombre} />
+      <Trivia />
+      <ComoLlegar />
     </main>
   );
 }

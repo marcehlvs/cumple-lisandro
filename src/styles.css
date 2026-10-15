@@ -140,6 +140,18 @@ h1 {
 .dot.atajada { background: var(--miss); border-color: var(--miss); color: #fff; }
 .hint { margin: 10px 0 0; font-weight: 700; }
 
+/* ---------- Trivia ---------- */
+.trivia-progreso { font-weight: 700; font-size: 0.9rem; opacity: 0.8; }
+.card h2.trivia-pregunta { font-size: 1.35rem; }
+.trivia-opciones { display: grid; gap: 8px; }
+.opcion { text-align: left; }
+.opcion:disabled { cursor: default; }
+.opcion.ok { background: var(--pitch); border-color: var(--pitch); color: #fff; }
+.opcion.mal { background: var(--miss); border-color: var(--miss); color: #fff; }
+.trivia-resultado:empty { display: none; }
+.trivia-resultado { display: grid; gap: 4px; }
+.card .trivia-veredicto { font-weight: 900; font-size: 1.1rem; }
+
 /* ---------- Victoria ---------- */
 .win > :not(.confetti) { position: relative; z-index: 1; }
 .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
